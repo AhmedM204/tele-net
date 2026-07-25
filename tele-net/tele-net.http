@@ -1,0 +1,6 @@
+@tele_net_HostAddress = http://localhost:5236
+
+GET {{tele_net_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
