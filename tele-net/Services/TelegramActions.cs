@@ -1,4 +1,5 @@
 ﻿using telegram_bot.Concrete;
+using telegram_bot.Extensions;
 using Telegram.Bot.Types;
 
 namespace tele_net.Services;
@@ -12,8 +13,6 @@ public class TelegramActions(Bot bot)
 
     private async Task Test(Update update)
     {
-        var chatId = update?.Message?.Chat.Id ?? -1;
-        if (chatId == -1) return;
-        await bot.SendMessageAsync(chatId, "Hey");
+        await bot.SendMessageAsync(update.GetChatId(), "Hey");
     }
 }
