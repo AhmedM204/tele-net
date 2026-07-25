@@ -8,7 +8,7 @@ namespace telegram_bot.Concrete;
 
 public partial class Bot
 {
-    public async Task SendMessageAsync(string chatId, string message, ReplyMarkup? replyMarkup = null)
+    public async Task SendMessageAsync(long chatId, string message, ReplyMarkup? replyMarkup = null)
     {
         try
         {
@@ -26,13 +26,17 @@ public partial class Bot
     }
 
 
+    /// <summary>
+    ///     Runs after any
+    /// </summary>
+    /// <param name="action"></param>
     public void AddDefaultAction(Func<Update, Task> action)
     {
         _defaultAction = action;
     }
 
 
-    public async Task EditMessageTextWithoutDelete(string chatId, int messageId, string newText,
+    public async Task EditMessageTextWithoutDelete(long chatId, int messageId, string newText,
         InlineKeyboardButton[][]? replyMarkup = null)
     {
         try
@@ -46,7 +50,7 @@ public partial class Bot
         }
     }
 
-    public async Task EditMessageTextWithDelete(string chatId, int messageId, string newText,
+    public async Task EditMessageTextWithDelete(long chatId, int messageId, string newText,
         InlineKeyboardButton[][]? replyMarkup = null)
     {
         try
@@ -77,7 +81,7 @@ public partial class Bot
         await client.GetUpdates(-1);
     }
 
-    public async Task SendPhotoAsync(string chatId, string photoUrl, string? caption = null,
+    public async Task SendPhotoAsync(long chatId, string photoUrl, string? caption = null,
         ReplyMarkup? replyMarkup = null)
     {
         try
@@ -90,7 +94,7 @@ public partial class Bot
         }
     }
 
-    public async Task EditPhotoAsync(string chatId, int messageId, string photoUrl, string? caption = null,
+    public async Task EditPhotoAsync(long chatId, int messageId, string photoUrl, string? caption = null,
         InlineKeyboardButton[][]? replyMarkup = null)
     {
         try
@@ -105,7 +109,7 @@ public partial class Bot
         }
     }
 
-    public async Task DeleteMessage(string chatId, int messageId)
+    public async Task DeleteMessage(long chatId, int messageId)
     {
         try
         {
@@ -131,7 +135,7 @@ public partial class Bot
         }
     }
 
-    public async Task SendDocumentAsync(string chatId, string htmlContent, string fileName = "document.html",
+    public async Task SendDocumentAsync(long chatId, string htmlContent, string fileName = "document.html",
         string? caption = null, ReplyMarkup? replyMarkup = null)
     {
         try
