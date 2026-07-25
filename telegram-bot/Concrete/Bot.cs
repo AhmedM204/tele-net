@@ -35,28 +35,6 @@ namespace telegram_bot.Concrete
             }
         }
 
-        private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
-        {
-            if (_defaultAction != null)
-            {
-                await _defaultAction.Invoke(update);
-            }
-            if (update.Type == UpdateType.Message && update.Message?.Text != null)
-            {
-                await InvokeTextMessages(update);
-            }
-            else if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery?.Data != null)
-            {
-                await InvokeCallbackQuery(update);
-            }
-
-
-        }
         private async Task InvokeTextMessages(Update update)
         {
             if (update.Type != UpdateType.Message || update.Message?.Text == null)
