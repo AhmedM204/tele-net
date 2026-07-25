@@ -1,39 +1,70 @@
-# Tele-Net 
-A small and flexible Telegram bot layer for .NET.
+# Tele-Net
 
-This project provides an **abstraction layer above
-[Telegram.Bot](https://github.com/TelegramBots/Telegram.Bot)**. It keeps
-Telegram update handling and common bot commands in one simple place,
-while allowing your application logic to stay separate.
+A small, lightweight, and flexible Telegram bot layer for .NET.
 
-## What it does
+Tele-Net provides an **abstraction layer above [Telegram.Bot](https://github.com/TelegramBots/Telegram.Bot)**. It handles Telegram updates and actions while keeping your application logic separate.
 
--   Receives Telegram updates through webhooks.
--   Supports simple actions such as commands.
--   Supports regex-based actions.
--   Supports a default action for other messages.
--   Provides common Telegram operations such as sending messages,
-    photos, and documents.
--   Works well with Dependency Injection.
--   Is lightweight and easy to extend.
+The goal is to make Telegram integration simple, clean, and easy to extend.
+
+## Features
+
+* Receives Telegram updates through webhooks.
+* Supports normal Telegram actions and commands.
+* Supports regex-based actions.
+* Supports a default action.
+* Provides common Telegram operations such as:
+
+  * Sending messages
+  * Sending photos
+  * Sending documents
+* Works with Dependency Injection.
+* Supports async actions.
+* Lightweight and easy to extend.
+* Keeps Telegram code separate from application logic.
+
+## Installation
+
+Add the Tele-Net projects to your solution and register the Telegram services using Dependency Injection.
+
+You also need a Telegram Bot Token.
+
+### 1. Create a Telegram Bot
+
+Create a bot using **BotFather** on Telegram and get your bot token.
+
+### 2. Add the Bot Token
+
+Add your bot token to your `appsettings.json`:
+
+```json
+{
+  "Telegram": {
+    "BotToken": "YOUR_BOT_TOKEN"
+  }
+}
+```
+
+**Never commit your real bot token to a public repository.**
+
+For local development, use `User Secrets` or environment variables if possible.
 
 ## Project Structure
 
-The main Telegram abstraction is in:
+The main Telegram abstraction is located in:
 
-``` text
+```text
 telegram-bot/
 ```
 
 Your application-specific Telegram events should be registered in:
 
-``` text
+```text
 tele-net/Services/TelegramActions.cs
 ```
 
 For example:
 
-``` csharp
+```csharp
 public void Register()
 {
     bot.AddAction("/test", Test);
@@ -41,31 +72,62 @@ public void Register()
 }
 ```
 
-Put the logic for each Telegram event in its action method.
+Each action contains the logic for its Telegram event.
 
-You can also keep the action small and call services from your `Core`
-layer. This is recommended when the logic becomes larger.
+For example:
 
-Example:
+```csharp
+private async Task Test(Update update)
+{
+    var chatId = update.GetChatId();
 
-``` text
+    await bot.SendMessageAsync(
+        chatId,
+        "Test successful."
+    );
+}
+```
+
+## Keep Business Logic in the Core Layer
+
+Telegram actions should usually stay small.
+
+If an action needs more complex logic, move that logic to your `Core` layer and call it from `TelegramActions`.
+
+```text
+Telegram
+   |
+   v
 TelegramActions
-      |
-      v
+   |
+   v
 Core Services
-      |
-      v
+   |
+   v
 Application Logic
 ```
 
-This keeps the Telegram layer simple and makes the project easier to
-maintain.
+For example:
+
+```csharp
+private async Task GenerateReport(Update update)
+{
+    var report = await reportService.GenerateAsync();
+
+    await bot.SendDocumentAsync(
+        update.GetChatId(),
+        report
+    );
+}
+```
+
+This keeps Telegram-specific code simple and makes the application easier to maintain and test.
 
 ## Local Development
 
-Telegram webhooks need a public HTTPS URL. Your local computer is not
-normally reachable from Telegram, so this project uses **ngrok** during
-Development.
+Telegram webhooks require a **public HTTPS URL**.
+
+Your local computer is normally not reachable from Telegram, so Tele-Net uses **ngrok** during development.
 
 ### Install ngrok
 
@@ -73,47 +135,139 @@ Download ngrok from the official website:
 
 https://ngrok.com/download
 
-After installation, make sure this works:
+After installation, check that it is available:
 
-``` bash
+```bash
 ngrok version
 ```
 
 You also need to configure your ngrok account and authentication token.
 
-When the application runs in Development, it can start ngrok
-automatically and use its public HTTPS URL for the Telegram webhook.
+During Development, the application can start ngrok automatically and use its public HTTPS URL for the Telegram webhook.
 
-You do not need ngrok in Production if your application already has a
-public HTTPS domain.
+You do **not** need ngrok in Production if your application already has a public HTTPS domain.
 
 ## Production
 
-In Production, set the webhook URL to your public API address:
+In Production, your application should use a public HTTPS domain instead of ngrok.
 
-``` json
+Set the webhook URL in your Production configuration:
+
+```json
 {
   "Telegram": {
+    "BotToken": "YOUR_BOT_TOKEN",
     "WebhookUrl": "https://api.example.com/api/telegram/webhook"
   }
 }
 ```
 
-The URL must be publicly reachable over HTTPS.
+The webhook URL must be publicly accessible over HTTPS.
 
-Keep sensitive values such as the Telegram bot token and webhook secret
-outside the public repository. Use environment variables, user secrets,
-or your hosting provider's secret management.
+For example:
 
-## Why use this?
+```text
+https://api.example.com/api/telegram/webhook
+```
 
-The goal is to keep Telegram integration:
+Make sure your server, reverse proxy, firewall, and HTTPS certificate allow Telegram to reach this endpoint.
 
--   **Simple**
--   **Lightweight**
--   **Flexible**
--   **Easy to extend**
--   **Separate from application logic**
+## Configuration
 
-You can use the built-in Telegram actions for small tasks, or connect
-them to your own `Core` services for larger features.
+A typical configuration looks like:
+
+```json
+{
+  "Telegram": {
+    "BotToken": "YOUR_BOT_TOKEN",
+    "WebhookUrl": "https://api.example.com/api/telegram/webhook"
+  }
+}
+```
+
+### Development
+
+```text
+BotToken
+    +
+ngrok
+    ↓
+Temporary public HTTPS URL
+    ↓
+Telegram Webhook
+```
+
+### Production
+
+```text
+BotToken
+    +
+Public HTTPS Domain
+    ↓
+Telegram Webhook
+```
+
+## Security
+
+Never commit sensitive information to a public repository.
+
+This includes:
+
+* Telegram Bot Token
+* API keys
+* Passwords
+* Database connection strings
+* Webhook secrets
+* Private keys
+
+For local development, use:
+
+* .NET User Secrets
+* Environment variables
+
+For Production, use:
+
+* Environment variables
+* Your hosting provider's secret manager
+* Another secure secret management system
+
+Do not put real secrets directly in `appsettings.json` if the file is tracked by Git.
+
+## Why Tele-Net?
+
+Tele-Net is designed to be:
+
+* **Simple**
+* **Lightweight**
+* **Flexible**
+* **Async-friendly**
+* **Easy to extend**
+* **Easy to integrate**
+* **Separate from application logic**
+
+You can keep small Telegram actions directly inside `TelegramActions`, or connect them to your own `Core` services when the application grows.
+
+The library does not force a specific application architecture. You can organize your business logic based on your project's needs.
+
+## Basic Flow
+
+```text
+Telegram
+    |
+    v
+Webhook
+    |
+    v
+Tele-Net
+    |
+    v
+TelegramActions
+    |
+    v
+Core Services
+    |
+    v
+Application Logic
+```
+
+This separation lets Tele-Net handle Telegram-specific work while your Core layer handles the actual application logic.
