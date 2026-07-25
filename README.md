@@ -1,5 +1,4 @@
-# Telegram Bot Abstraction
-
+# Tele-Net 
 A small and flexible Telegram bot layer for .NET.
 
 This project provides an **abstraction layer above
