@@ -17,9 +17,9 @@ public class TelegramWebhookService(
         var baseUrl = settings.Value.WebhookUrl;
         var secret = settings.Value.WebhookSecret;
 
-        if (string.IsNullOrEmpty(baseUrl) && env.IsDevelopment())
+        if (env.IsDevelopment())
         {
-            logger.LogInformation("No Webhook URL found in config. Auto-starting ngrok...");
+            logger.LogInformation("Development env => Auto-starting ngrok...");
             baseUrl = await GetOrStartNgrokAsync();
         }
 
