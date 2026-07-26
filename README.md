@@ -39,7 +39,7 @@ Add your bot token to your `appsettings.json`:
 ```json
 {
   "Telegram": {
-    "BotToken": "YOUR_BOT_TOKEN"
+    "Token": "YOUR_BOT_TOKEN"
   }
 }
 ```
@@ -156,13 +156,13 @@ Set the webhook URL in your Production configuration:
 ```json
 {
   "Telegram": {
-    "BotToken": "YOUR_BOT_TOKEN",
-    "WebhookUrl": "https://api.example.com/api/telegram/webhook"
+    "Token": "YOUR_BOT_TOKEN",
+    "WebhookUrl": "https://api.example.com/"
   }
 }
 ```
 
-The webhook URL must be publicly accessible over HTTPS.
+The webhook URL must be publicly accessible over ****HTTPS****.
 
 For example:
 
@@ -179,8 +179,9 @@ A typical configuration looks like:
 ```json
 {
   "Telegram": {
-    "BotToken": "YOUR_BOT_TOKEN",
-    "WebhookUrl": "https://api.example.com/api/telegram/webhook"
+    "Token": "YOUR_BOT_TOKEN",
+    "WebhookSecret": "MySuperSecretToken123",
+    "WebhookUrl": "https://api.example.com/"
   }
 }
 ```
